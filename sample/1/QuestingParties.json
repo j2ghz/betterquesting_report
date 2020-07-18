@@ -1,0 +1,22 @@
+{
+  "parties:9": {
+    "0:10": {
+      "members:9": {
+        "0:10": {
+          "uuid:8": "5a9b914d-18b2-4897-b47e-d32c141a459a",
+          "status:8": "MEMBER"
+        },
+        "1:10": {
+          "uuid:8": "ae3f5a21-1de3-41af-91c1-9c7b64847ff8",
+          "status:8": "OWNER"
+        }
+      },
+      "partyID:3": 0,
+      "properties:10": {
+        "betterquesting:10": {
+          "name:8": "J2ghz"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "nameCache:9": {
+    "0:10": {
+      "name:8": "articCz",
+      "isOP:1": 0,
+      "uuid:8": "5a9b914d-18b2-4897-b47e-d32c141a459a"
+    },
+    "1:10": {
+      "name:8": "ArcanumRCT",
+      "isOP:1": 0,
+      "uuid:8": "0e6e8903-8416-4981-b7fc-bb5f5b72faf8"
+    },
+    "2:10": {
+      "name:8": "J2ghz",
+      "isOP:1": 1,
+      "uuid:8": "ae3f5a21-1de3-41af-91c1-9c7b64847ff8"
+    },
+    "3:10": {
+      "name:8": "ssiimik",
+      "isOP:1": 0,
+      "uuid:8": "17e1749d-5761-4ca7-8db7-bc970d79cc8d"
+    }
+  }
+}
