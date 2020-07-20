@@ -1,6 +1,7 @@
 mod quest_database;
 mod quest_progress;
 mod name_cache;
+mod questing_parties;
 
 #[cfg(test)]
 mod tests {
