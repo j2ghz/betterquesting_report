@@ -79,7 +79,7 @@ pub fn parse<P:AsRef<Path>>(path : P) -> Result<Root,Box<dyn Error>>{
 mod tests {
     use super::Root;
     use chrono::prelude::*;
-    use std::{cmp::Ordering, collections::BinaryHeap, fs};
+    use std::{collections::BinaryHeap, fs};
 
     #[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
     struct QuestCompletion {
