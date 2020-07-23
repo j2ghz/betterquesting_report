@@ -1,17 +1,17 @@
 use serde::Deserialize;
 use serde::Serialize;
-use std::{error::Error, path::Path, fs, collections::HashMap};
+use std::{collections::HashMap, error::Error, fs, path::Path};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Root {
     #[serde(rename = "parties:9")]
-    pub parties: HashMap<String,Parties>,
+    pub parties: HashMap<String, Parties>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Parties {
     #[serde(rename = "members:9")]
-    pub members: HashMap<String,Members>,
+    pub members: HashMap<String, Members>,
     #[serde(rename = "partyID:3")]
     pub party_id: i64,
     #[serde(rename = "properties:10")]
@@ -37,7 +37,6 @@ pub struct Betterquesting {
     #[serde(rename = "name:8")]
     pub name: String,
 }
-
 
 #[cfg(test)]
 mod tests {

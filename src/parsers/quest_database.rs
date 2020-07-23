@@ -1,6 +1,6 @@
 use serde::Deserialize;
 use serde::Serialize;
-use std::{path::Path, collections::HashMap, fs, error::Error};
+use std::{collections::HashMap, error::Error, fs, path::Path};
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Root {
@@ -925,7 +925,7 @@ pub struct BetterquestingQuestSettings {
     pub home_offset_y: i64,
 }
 
-pub fn parse<P:AsRef<Path>>(path : P) -> Result<Root,Box<dyn Error>>{
+pub fn parse<P: AsRef<Path>>(path: P) -> Result<Root, Box<dyn Error>> {
     let text = fs::read_to_string(path)?;
     let result = serde_json::from_str::<Root>(&text)?;
     Ok(result)

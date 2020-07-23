@@ -1,6 +1,6 @@
 use serde::Deserialize;
 use serde::Serialize;
-use std::{fs, collections::HashMap, path::Path, error::Error};
+use std::{collections::HashMap, error::Error, fs, path::Path};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Root {
@@ -69,7 +69,7 @@ pub enum TaskType {
     BqStandardRetrieval,
 }
 
-pub fn parse<P:AsRef<Path>>(path : P) -> Result<Root,Box<dyn Error>>{
+pub fn parse<P: AsRef<Path>>(path: P) -> Result<Root, Box<dyn Error>> {
     let text = fs::read_to_string(path)?;
     let result = serde_json::from_str::<Root>(&text)?;
     Ok(result)

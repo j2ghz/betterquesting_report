@@ -1,12 +1,12 @@
-mod quest_database;
-mod quest_progress;
-mod name_cache;
-mod questing_parties;
+pub mod name_cache;
+pub mod quest_database;
+pub mod quest_progress;
+pub mod questing_parties;
 
 #[cfg(test)]
 mod tests {
     use chrono::prelude::*;
-    use std::{collections::{HashMap, BinaryHeap}};
+    use std::collections::{BinaryHeap, HashMap};
 
     #[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
     struct QuestCompletion {
@@ -17,9 +17,15 @@ mod tests {
 
     #[test]
     fn desrialize_sample() {
-        let quests = crate::parsers::quest_database::parse("./sample/1/QuestDatabase.json").unwrap().quest_database;
-        let quests = quests.iter().map(|(_id,q)| (q.quest_id,q.clone())).collect::<HashMap<i64,super::quest_database::Quest>>();
-        let completions = crate::parsers::quest_progress::parse("./sample/1/QuestProgress.json").unwrap();    
+        let quests = crate::parsers::quest_database::parse("./sample/1/QuestDatabase.json")
+            .unwrap()
+            .quest_database;
+        let quests = quests
+            .iter()
+            .map(|(_id, q)| (q.quest_id, q.clone()))
+            .collect::<HashMap<i64, super::quest_database::Quest>>();
+        let completions =
+            crate::parsers::quest_progress::parse("./sample/1/QuestProgress.json").unwrap();
 
         let mut items = completions
             .quest_progress
@@ -41,7 +47,10 @@ mod tests {
                 println!("{:?}", last_date)
             }
             let quest = quests.get(&item.id).unwrap();
-            println!("{:?} {} {}", item.timestamp,item.user, quest.properties.betterquesting.name);
+            println!(
+                "{:?} {} {}",
+                item.timestamp, item.user, quest.properties.betterquesting.name
+            );
         }
     }
 }

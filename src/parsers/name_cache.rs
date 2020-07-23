@@ -1,11 +1,11 @@
 use serde::Deserialize;
 use serde::Serialize;
-use std::{error::Error, path::Path, fs, collections::HashMap};
+use std::{collections::HashMap, error::Error, fs, path::Path};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Root {
     #[serde(rename = "nameCache:9")]
-    pub name_cache: HashMap<String,NameCacheItem>,
+    pub name_cache: HashMap<String, NameCacheItem>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -18,7 +18,7 @@ pub struct NameCacheItem {
     pub uuid: String,
 }
 
-pub fn parse<P:AsRef<Path>>(path : P) -> Result<Root,Box<dyn Error>>{
+pub fn parse<P: AsRef<Path>>(path: P) -> Result<Root, Box<dyn Error>> {
     let text = fs::read_to_string(path)?;
     let result = serde_json::from_str::<Root>(&text)?;
     Ok(result)
