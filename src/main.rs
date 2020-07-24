@@ -93,7 +93,7 @@ fn quests_history(file_loc: State<FileLocation>) -> Template {
 fn main() {
     rocket::ignite()
         .manage(FileLocation {
-            betterquesting: "./sample/1/".into(),
+            betterquesting: "/mnt/data/old/services/GTNH/world/betterquesting/".into(),
         })
         .mount("/", routes![index, quests_history]).attach(Template::fairing())
         .launch();
