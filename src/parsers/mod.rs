@@ -1,4 +1,4 @@
-use chrono::{DateTime, TimeZone, Utc};
+use chrono::{DateTime, Utc};
 use quest_database::Quest;
 use serde::Serialize;
 use std::{collections::HashMap, path::Path};
@@ -45,7 +45,7 @@ pub fn load_data<P: AsRef<Path>>(dir: P) -> Data {
             let name = ql.properties.betterquesting.name.clone();
             ql.quests
                 .iter()
-                .map(|(_id, q)| (q.id.clone(), name.clone()))
+                .map(|(_id, q)| (q.id, name.clone()))
                 .collect::<Vec<_>>()
                 .into_iter()
         })
@@ -53,7 +53,7 @@ pub fn load_data<P: AsRef<Path>>(dir: P) -> Data {
 
     let mut quest_unlocks: HashMap<i64, Vec<i64>> = HashMap::new();
 
-    for (_id, q) in &quests {
+    for q in quests.values() {
         for prereq_id in &q.pre_requisites {
             if quest_unlocks.contains_key(&prereq_id) {
                 let old = quest_unlocks.get(&prereq_id).unwrap().to_vec();

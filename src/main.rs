@@ -6,10 +6,7 @@ use chrono::{DateTime, Local, Utc};
 use rocket::State;
 use rocket_contrib::templates::Template;
 use serde::Serialize;
-use std::{
-    collections::{BinaryHeap, HashMap},
-    path::PathBuf,
-};
+use std::{collections::BinaryHeap, path::PathBuf};
 
 #[macro_use]
 extern crate rocket;
@@ -50,7 +47,7 @@ struct QuestRef {
 }
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize)]
-struct Ctx {
+struct QuestHistoryCtx {
     quests: Vec<DateQuests>,
 }
 
@@ -66,8 +63,8 @@ fn quests_history(file_loc: State<FileLocation>) -> Template {
     let mut items = data
         .completions
         .quest_progress
-        .iter()
-        .flat_map(|(_id, q)| {
+        .values()
+        .flat_map(|q| {
             let id = q.quest_id;
             q.completed.iter().map(move |(_idc, c)| QuestCompletion {
                 id,
@@ -137,10 +134,59 @@ fn quests_history(file_loc: State<FileLocation>) -> Template {
 
     Template::render(
         "quests_history",
-        &Ctx {
+        &QuestHistoryCtx {
             quests: date_quests,
         },
     )
+}
+
+#[get("/quest/<id>")]
+fn quest(id: i64, file_loc: State<FileLocation>) -> Template {
+    let data = parsers::load_data(&file_loc.betterquesting);
+
+    let quest = data.quests.get(&id).unwrap();
+    data.quest_ql.get(&id).unwrap();
+    data.quest_unlocks.get(&id);
+
+    let quest = QuestDetails {
+        id: id,
+        name: strip_formatting(&quest.properties.betterquesting.name),
+        questline: data
+            .quest_ql
+            .get(&id)
+            .unwrap_or(&"Questline not found".to_string())
+            .clone(),
+        desc: quest
+            .properties
+            .betterquesting
+            .desc
+            .lines()
+            .map(|s| s.to_string())
+            .collect(),
+        user: "".to_string(),
+        time: "".to_string(),
+        unlocks: data
+            .quest_unlocks
+            .get(&id)
+            .iter()
+            .flat_map(|x| x.iter())
+            .map(|ref_quest_id| {
+                let quest = data.quests.get(&ref_quest_id).unwrap();
+                QuestRef {
+                    id: ref_quest_id.clone(),
+                    name: strip_formatting(&quest.properties.betterquesting.name),
+                    questline: data
+                        .quest_ql
+                        .get(ref_quest_id)
+                        .unwrap_or(&"Questline not found".to_string())
+                        .clone(),
+                }
+            })
+            .collect::<BinaryHeap<_>>()
+            .into_sorted_vec(),
+    };
+
+    Template::render("quest", &quest)
 }
 
 fn main() {
@@ -148,7 +194,7 @@ fn main() {
         .manage(FileLocation {
             betterquesting: "/mnt/data/old/services/GTNH/world/betterquesting/".into(),
         })
-        .mount("/", routes![index, quests_history])
+        .mount("/", routes![index, quests_history, quest])
         .attach(Template::fairing())
         .launch();
 }
