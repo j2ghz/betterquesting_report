@@ -28,24 +28,24 @@ pub fn load_data<P: AsRef<Path>>(dir: P) -> Data {
     let db = quest_database::parse(dir.as_ref().join("QuestDatabase.json")).unwrap();
     let quests = db
         .quest_database
-        .iter()
-        .map(|(_id, q)| (q.quest_id, q.clone()))
+        .values()
+        .map(| q| (q.quest_id, q.clone()))
         .collect::<HashMap<i64, quest_database::Quest>>();
     let users = name_cache::parse(dir.as_ref().join("NameCache.json"))
         .unwrap()
         .name_cache
-        .iter()
-        .map(|(_id, i)| (i.uuid.clone(), i.name.clone()))
+        .values()
+        .map(| i| (i.uuid.clone(), i.name.clone()))
         .collect::<HashMap<String, String>>();
 
     let quest_ql: HashMap<i64, String> = db
         .quest_lines
-        .iter()
-        .flat_map(|(_id, ql)| {
+        .values()
+        .flat_map(| ql| {
             let name = ql.properties.betterquesting.name.clone();
             ql.quests
-                .iter()
-                .map(|(_id, q)| (q.id, name.clone()))
+                .values()
+                .map(|q| (q.id, name.clone()))
                 .collect::<Vec<_>>()
                 .into_iter()
         })
@@ -105,18 +105,18 @@ mod tests {
             .unwrap()
             .quest_database;
         let quests = quests
-            .iter()
-            .map(|(_id, q)| (q.quest_id, q.clone()))
+            .values()
+            .map(|q| (q.quest_id, q.clone()))
             .collect::<HashMap<i64, super::quest_database::Quest>>();
         let completions =
             crate::parsers::quest_progress::parse("./sample/1/QuestProgress.json").unwrap();
 
         let mut items = completions
             .quest_progress
-            .iter()
-            .flat_map(|(_id, q)| {
+            .values()
+            .flat_map(|q| {
                 let id = q.quest_id;
-                q.completed.iter().map(move |(_idc, c)| QuestCompletion {
+                q.completed.values().map(move |c| QuestCompletion {
                     id,
                     user: c.uuid.clone(),
                     timestamp: Utc.timestamp_millis(c.timestamp),

@@ -66,7 +66,7 @@ fn quests_history(file_loc: State<FileLocation>) -> Template {
         .values()
         .flat_map(|q| {
             let id = q.quest_id;
-            q.completed.iter().map(move |(_idc, c)| QuestCompletion {
+            q.completed.values().map(move | c| QuestCompletion {
                 id,
                 user: c.uuid.clone(),
                 timestamp: Utc.timestamp_millis(c.timestamp),

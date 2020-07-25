@@ -940,7 +940,7 @@ mod tests {
     fn desrialize_sample() {
         let text = fs::read_to_string("./sample/1/QuestDatabase.json").unwrap();
         let result = serde_json::from_str::<Root>(&text).unwrap();
-        for (_id, q) in result.quest_database {
+        for q in result.quest_database.values() {
             println!("{}", q.properties.betterquesting.name);
         }
     }
