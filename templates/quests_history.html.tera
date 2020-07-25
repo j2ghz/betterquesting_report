@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Hello Bulma!</title>
+    <title>Quests completed</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
   </head>
   <body>
@@ -18,32 +18,25 @@
                 <div class="box">
                     <article class="media">
                         <div class="media-content">
-                        <div class="content">
                             <p>
-                            <strong>{{quest.name}}</strong> <small>{{quest.user}}</small> <small>{{quest.time}}</small>
+                            <strong>{{quest.name}}</strong> <small>@{{quest.user}}</small> <small>{{quest.time}}</small>
                             <br>
-                            {{quest.desc}}
+                            <div class="content">
+                              {% for line in quest.desc %}
+                                {{line}}<br/>
+                              {% endfor%}
+                            </div>                            
+                              {% for q in quest.unlocks %}
+                                {% if loop.first %}
+                                  <h6 class="title is-6">Unlocks</h6>
+                                  <div class="content">
+                                {% endif %}
+                                {{q.questline}}: {{q.name}} (#{{q.id}})<br/>
+                                {% if loop.last %}
+                                  </div>
+                                {% endif %}
+                              {% endfor%}
                             </p>
-                        </div>
-                        <nav class="level is-mobile">
-                            <div class="level-left">
-                            <a class="level-item" aria-label="reply">
-                                <span class="icon is-small">
-                                <i class="fas fa-reply" aria-hidden="true"></i>
-                                </span>
-                            </a>
-                            <a class="level-item" aria-label="retweet">
-                                <span class="icon is-small">
-                                <i class="fas fa-retweet" aria-hidden="true"></i>
-                                </span>
-                            </a>
-                            <a class="level-item" aria-label="like">
-                                <span class="icon is-small">
-                                <i class="fas fa-heart" aria-hidden="true"></i>
-                                </span>
-                            </a>
-                            </div>
-                        </nav>
                         </div>
                     </article>
                     </div>
