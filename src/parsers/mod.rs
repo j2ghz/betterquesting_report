@@ -58,14 +58,14 @@ pub fn load_data<P: AsRef<Path>>(dir: P) -> Data {
             if quest_unlocks.contains_key(&prereq_id) {
                 let old = quest_unlocks.get(&prereq_id).unwrap().to_vec();
                 quest_unlocks
-                    .insert(prereq_id.clone(), {
+                    .insert(*prereq_id, {
                         let mut new: Vec<_> = old.as_slice().to_vec();
                         new.push(q.quest_id);
                         new
                     })
                     .unwrap();
             } else {
-                quest_unlocks.insert(prereq_id.clone(), vec![q.quest_id]);
+                quest_unlocks.insert(*prereq_id, vec![q.quest_id]);
             }
         }
     }

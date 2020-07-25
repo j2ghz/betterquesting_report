@@ -118,7 +118,7 @@ fn quests_history(file_loc: State<FileLocation>) -> Template {
                 .map(|ref_quest_id| {
                     let quest = data.quests.get(&ref_quest_id).unwrap();
                     QuestRef {
-                        id: ref_quest_id.clone(),
+                        id: *ref_quest_id,
                         name: strip_formatting(&quest.properties.betterquesting.name),
                         questline: data
                             .quest_ql
@@ -149,7 +149,7 @@ fn quest(id: i64, file_loc: State<FileLocation>) -> Template {
     data.quest_unlocks.get(&id);
 
     let quest = QuestDetails {
-        id: id,
+        id,
         name: strip_formatting(&quest.properties.betterquesting.name),
         questline: data
             .quest_ql
@@ -173,7 +173,7 @@ fn quest(id: i64, file_loc: State<FileLocation>) -> Template {
             .map(|ref_quest_id| {
                 let quest = data.quests.get(&ref_quest_id).unwrap();
                 QuestRef {
-                    id: ref_quest_id.clone(),
+                    id: *ref_quest_id,
                     name: strip_formatting(&quest.properties.betterquesting.name),
                     questline: data
                         .quest_ql
