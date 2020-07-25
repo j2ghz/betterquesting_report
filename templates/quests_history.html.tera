@@ -17,26 +17,18 @@
             {% for quest in quest_date.quests %}
                 <div class="box">
                     <article class="media">
-                        <div class="media-content">
-                            <p>
-                            <strong>{{quest.name}}</strong> <small>@{{quest.user}}</small> <small>{{quest.time}}</small>
-                            <br>
-                            <div class="content">
-                              {% for line in quest.desc %}
-                                {{line}}<br/>
-                              {% endfor%}
-                            </div>                            
+                        <div class="media-content">                            
+                            <span class="tag is-light">{{quest.questline}}</span> <strong>{{quest.name}}</strong> <a href="/quest/{{quest.id}}">(#{{quest.id}})</a> <small>@{{quest.user}}</small> <small>{{quest.time}}</small>
                               {% for q in quest.unlocks %}
                                 {% if loop.first %}
-                                  <h6 class="title is-6">Unlocks</h6>
-                                  <div class="content">
+                                  <h6 class="title is-6">Unlocks:</h6>
+                                  <div class="content"><ul>
                                 {% endif %}
-                                {{q.questline}}: {{q.name}} (#{{q.id}})<br/>
+                                <li><span class="tag is-light">{{q.questline}}</span> {{q.name}} <a href="/quest/{{q.id}}">(#{{q.id}})</a></li>
                                 {% if loop.last %}
-                                  </div>
+                                  </ul></div>
                                 {% endif %}
-                              {% endfor%}
-                            </p>
+                              {% endfor%}                            
                         </div>
                     </article>
                     </div>

@@ -1,7 +1,7 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 use ::betterquesting_report::parsers;
 use chrono::TimeZone;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Local, Utc};
 use rocket::State;
 use rocket_contrib::templates::Template;
 use serde::Serialize;
@@ -26,7 +26,9 @@ struct QuestCompletion {
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize)]
 struct QuestDetails {
+    id: i64,
     name: String,
+    questline: String,
     desc: Vec<String>,
     user: String,
     time: String,
@@ -41,9 +43,9 @@ struct DateQuests {
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize)]
 struct QuestRef {
+    questline: String,
     id: i64,
     name: String,
-    questline: String,
 }
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize)]
@@ -100,7 +102,7 @@ fn quests_history(file_loc: State<FileLocation>) -> Template {
         .flat_map(|(_id, ql)| {
             let name = ql.properties.betterquesting.name.clone();
             ql.quests
-                .iter()                
+                .iter()
                 .map(|(_id, q)| (q.id.clone(), name.clone()))
                 .collect::<Vec<_>>()
                 .into_iter()
@@ -134,24 +136,29 @@ fn quests_history(file_loc: State<FileLocation>) -> Template {
             })
         })
         .collect::<BinaryHeap<_>>();
-    let mut last_date = Utc.timestamp_millis(0).date();
+    let mut last_date = Utc.timestamp_millis(0).with_timezone(&Local).date();
     let mut date_quests = Vec::new();
     let mut day = Vec::new();
     while !items.is_empty() {
         let item = items.pop().unwrap();
-        if item.timestamp.date() != last_date {
+        if item.timestamp.with_timezone(&Local).date() != last_date {
             if !day.is_empty() {
                 date_quests.push(DateQuests {
                     date: last_date.format("%v").to_string(),
                     quests: day,
                 });
             }
-            last_date = item.timestamp.date();
+            last_date = item.timestamp.with_timezone(&Local).date();
             day = Vec::new();
         }
         let quest = quests.get(&item.id).unwrap();
         day.push(QuestDetails {
+            id: item.id,
             name: strip_formatting(&quest.properties.betterquesting.name),
+            questline: quest_ql
+                .get(&item.id)
+                .unwrap_or(&"Questline not found".to_string())
+                .clone(),
             desc: quest
                 .properties
                 .betterquesting
@@ -160,7 +167,11 @@ fn quests_history(file_loc: State<FileLocation>) -> Template {
                 .map(|s| s.to_string())
                 .collect(),
             user: users.get(&item.user).unwrap().clone(),
-            time: item.timestamp.format("%T").to_string(),
+            time: item
+                .timestamp
+                .with_timezone(&Local)
+                .format("%T")
+                .to_string(),
             unlocks: quest_unlocks
                 .get(&item.id)
                 .iter()
@@ -170,10 +181,14 @@ fn quests_history(file_loc: State<FileLocation>) -> Template {
                     QuestRef {
                         id: ref_quest_id.clone(),
                         name: strip_formatting(&quest.properties.betterquesting.name),
-                        questline: quest_ql.get(ref_quest_id).unwrap_or(&"Questline not found".to_string()).clone(),
+                        questline: quest_ql
+                            .get(ref_quest_id)
+                            .unwrap_or(&"Questline not found".to_string())
+                            .clone(),
                     }
                 })
-                .collect(),
+                .collect::<BinaryHeap<_>>()
+                .into_sorted_vec(),
         });
     }
 
