@@ -8,12 +8,27 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 
-    <title>Quest details</title>
+    <title>{{name}} - Quest details</title>
   </head>
   <body>
     <div class="container">
-        <h1>Quest details</h1>
-        {{desc}}
+        <h1>{{name}} (#{{id}})</h1>
+
+        {% for line in desc %}
+          {{line}}<br/>
+        {% endfor %}
+        Requires:
+        <ul>
+          {% for req in requires %}
+            <li><span class="badge badge-light">{{req.questline}}</span> {{req.name}} (<a href="/quest/{{req.id}}">#{{req.id}}</a>)</li>
+          {% endfor %}
+        </ul>
+        Unlocks:
+        <ul>
+          {% for unl in unlocks %}
+            <li><span class="badge badge-light">{{unl.questline}}</span> {{unl.name}} (<a href="/quest/{{unl.id}}">#{{unl.id}}</a>)</li>
+          {% endfor %}
+        </ul>
     </div>
     
 

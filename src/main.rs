@@ -31,6 +31,7 @@ struct QuestDetails {
     user: String,
     time: String,
     unlocks: Vec<QuestRef>,
+    requires: Vec<QuestRef>,
 }
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize)]
@@ -66,7 +67,7 @@ fn quests_history(file_loc: State<FileLocation>) -> Template {
         .values()
         .flat_map(|q| {
             let id = q.quest_id;
-            q.completed.values().map(move | c| QuestCompletion {
+            q.completed.values().map(move |c| QuestCompletion {
                 id,
                 user: c.uuid.clone(),
                 timestamp: Utc.timestamp_millis(c.timestamp),
@@ -129,6 +130,7 @@ fn quests_history(file_loc: State<FileLocation>) -> Template {
                 })
                 .collect::<BinaryHeap<_>>()
                 .into_sorted_vec(),
+            requires: Vec::default(),
         });
     }
 
@@ -184,6 +186,22 @@ fn quest(id: i64, file_loc: State<FileLocation>) -> Template {
             })
             .collect::<BinaryHeap<_>>()
             .into_sorted_vec(),
+        requires: quest
+            .pre_requisites
+            .iter()
+            .map(|id| {
+                let quest = data.quests.get(id).unwrap();
+                QuestRef {
+                    id: quest.quest_id,
+                    name: strip_formatting(&quest.properties.betterquesting.name),
+                    questline: data
+                        .quest_ql
+                        .get(&quest.quest_id)
+                        .unwrap_or(&"Questline not found".to_string())
+                        .to_string(),
+                }
+            })
+            .collect(),
     };
 
     Template::render("quest", &quest)
