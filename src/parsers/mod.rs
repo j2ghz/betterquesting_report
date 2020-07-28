@@ -1,9 +1,7 @@
-use chrono::{Date, DateTime, Local, TimeZone, Utc};
-use itertools::*;
-
+use chrono::{DateTime, TimeZone, Utc};
 use serde::Serialize;
 use std::{
-    collections::{BTreeMap, BinaryHeap, HashMap},
+    collections::{BinaryHeap, HashMap},
     path::Path,
 };
 

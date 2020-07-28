@@ -8,25 +8,25 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 
-    <title>{{name}} - Quest details</title>
+    <title>{{quest.name}} - Quest details</title>
   </head>
   <body>
     <div class="container">
-        <h1>{{name}} (#{{id}})</h1>
+        <h1>{{quest.name}} (#{{quest.id}})</h1>
 
-        {% for line in desc %}
+        {% for line in quest.desc %}
           {{line}}<br/>
         {% endfor %}
         Requires:
         <ul>
-          {% for req in requires %}
-            <li><span class="badge badge-light">{{req.questline}}</span> {{req.name}} (<a href="/quest/{{req.id}}">#{{req.id}}</a>)</li>
+          {% for req in quest.requires %}
+            <li><span class="badge badge-light">{{req.questline.name | default (value="Unknown")}}</span> {{req.name}} (<a href="/quest/{{req.id}}">#{{req.id}}</a>)</li>
           {% endfor %}
         </ul>
         Unlocks:
         <ul>
-          {% for unl in unlocks %}
-            <li><span class="badge badge-light">{{unl.questline}}</span> {{unl.name}} (<a href="/quest/{{unl.id}}">#{{unl.id}}</a>)</li>
+          {% for unl in quest.unlocks %}
+            <li><span class="badge badge-light">{{unl.questline.name | default (value="Unknown")}}</span> {{unl.name}} (<a href="/quest/{{unl.id}}">#{{unl.id}}</a>)</li>
           {% endfor %}
         </ul>
     </div>
