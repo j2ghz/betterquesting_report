@@ -1,27 +1,64 @@
-use chrono::{DateTime, Utc};
-use quest_database::Quest;
+use chrono::{Date, DateTime, Local, TimeZone, Utc};
+use itertools::*;
+
 use serde::Serialize;
-use std::{collections::HashMap, path::Path};
+use std::{
+    collections::{BTreeMap, BinaryHeap, HashMap},
+    path::Path,
+};
 
 pub mod name_cache;
 pub mod quest_database;
 pub mod quest_progress;
 pub mod questing_parties;
 
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize, Clone)]
 pub struct QuestCompletion {
-    timestamp: DateTime<Utc>,
-    user: String,
-    id: i64,
+    pub timestamp: DateTime<Utc>,
+    pub user: String,
+    pub quest: QuestRef,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize, Clone)]
+pub struct QuestRef {
+    pub questline: Option<QuestLineRef>,
+    pub id: i64,
+    pub name: String,
+}
+
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize)]
+pub struct QuestDetails {
+    pub id: i64,
+    pub name: String,
+    pub questline: Option<QuestLineRef>,
+    pub desc: Vec<String>,
+    pub unlocks: Vec<QuestRef>,
+    pub requires: Vec<QuestRef>,
+}
+
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize, Clone)]
+pub struct QuestLineRef {
+    pub id: i64,
+    pub name: String,
+}
+
+#[derive(Debug)]
 pub struct Data {
-    pub quests: HashMap<i64, Quest>,
-    pub users: HashMap<String, String>,
-    pub quest_ql: HashMap<i64, String>,
-    pub quest_unlocks: HashMap<i64, Vec<i64>>,
-    pub completions: quest_progress::Root,
+    pub quests: HashMap<i64, QuestDetails>,
+    pub completions: Vec<QuestCompletion>,
+}
+
+pub fn strip_formatting(str: &str) -> String {
+    let mut result = String::new();
+    let mut chars = str.chars();
+    while let Some(c) = chars.next() {
+        if c == '§' {
+            chars.next().unwrap();
+        } else {
+            result.push(c);
+        }
+    }
+    result
 }
 
 pub fn load_data<P: AsRef<Path>>(dir: P) -> Data {
@@ -29,23 +66,27 @@ pub fn load_data<P: AsRef<Path>>(dir: P) -> Data {
     let quests = db
         .quest_database
         .values()
-        .map(| q| (q.quest_id, q.clone()))
+        .map(|q| (q.quest_id, q.clone()))
         .collect::<HashMap<i64, quest_database::Quest>>();
-    let users = name_cache::parse(dir.as_ref().join("NameCache.json"))
-        .unwrap()
-        .name_cache
-        .values()
-        .map(| i| (i.uuid.clone(), i.name.clone()))
-        .collect::<HashMap<String, String>>();
 
-    let quest_ql: HashMap<i64, String> = db
+    let quest_ql: HashMap<i64, QuestLineRef> = db
         .quest_lines
         .values()
-        .flat_map(| ql| {
+        .flat_map(|ql| {
             let name = ql.properties.betterquesting.name.clone();
+            let id = ql.line_id;
+            let desc = ql.properties.betterquesting.desc.clone();
             ql.quests
                 .values()
-                .map(|q| (q.id, name.clone()))
+                .map(|q| {
+                    (
+                        q.id,
+                        QuestLineRef {
+                            id,
+                            name: name.clone(),
+                        },
+                    )
+                })
                 .collect::<Vec<_>>()
                 .into_iter()
         })
@@ -69,14 +110,82 @@ pub fn load_data<P: AsRef<Path>>(dir: P) -> Data {
             }
         }
     }
+    let quest_unlocks = quest_unlocks;
 
-    let completions = quest_progress::parse(dir.as_ref().join("QuestProgress.json")).unwrap();
+    let quests: HashMap<i64, QuestDetails> = quests
+        .values()
+        .map(|q| QuestDetails {
+            id: q.quest_id,
+            name: strip_formatting(&q.properties.betterquesting.name),
+            desc: q
+                .properties
+                .betterquesting
+                .desc
+                .lines()
+                .map(|s| s.to_string())
+                .collect(),
+            questline: quest_ql.get(&q.quest_id).map(QuestLineRef::to_owned),
+            requires: q
+                .pre_requisites
+                .iter()
+                .map(|id| {
+                    let ref_q = quests.get(id).unwrap();
+                    QuestRef {
+                        id: ref_q.quest_id,
+                        name: ref_q.properties.betterquesting.name.clone(),
+                        questline: quest_ql.get(&ref_q.quest_id).map(QuestLineRef::to_owned),
+                    }
+                })
+                .collect(),
+            unlocks: quest_unlocks
+                .get(&q.quest_id)
+                .iter()
+                .flat_map(|x| x.iter())
+                .map(|ref_quest_id| {
+                    let quest = quests.get(&ref_quest_id).unwrap();
+                    QuestRef {
+                        id: *ref_quest_id,
+                        name: strip_formatting(&quest.properties.betterquesting.name),
+                        questline: quest_ql.get(ref_quest_id).map(QuestLineRef::to_owned),
+                    }
+                })
+                .collect::<BinaryHeap<_>>()
+                .into_sorted_vec(),
+        })
+        .map(|q| (q.id, q))
+        .collect();
+    let users = name_cache::parse(dir.as_ref().join("NameCache.json"))
+        .unwrap()
+        .name_cache
+        .values()
+        .map(|i| (i.uuid.clone(), i.name.clone()))
+        .collect::<HashMap<String, String>>();
+
+    let completions = quest_progress::parse(dir.as_ref().join("QuestProgress.json"))
+        .unwrap()
+        .quest_progress
+        .values()
+        .flat_map(|qp| {
+            let q = QuestRef {
+                id: qp.quest_id,
+                name: quests.get(&qp.quest_id).unwrap().name.clone(),
+                questline: quest_ql.get(&qp.quest_id).map(QuestLineRef::to_owned),
+            };
+            qp.completed
+                .values()
+                .map(|compl| QuestCompletion {
+                    quest: q.clone(),
+                    timestamp: Utc.timestamp_millis(compl.timestamp),
+                    user: users.get(&compl.uuid).unwrap().to_owned(),
+                })
+                .collect::<Vec<_>>()
+                .into_iter()
+        })
+        .collect::<BinaryHeap<QuestCompletion>>()
+        .into_sorted_vec();
 
     Data {
         quests,
-        users,
-        quest_ql,
-        quest_unlocks,
         completions,
     }
 }

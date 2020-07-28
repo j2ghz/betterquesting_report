@@ -99,7 +99,7 @@ mod tests {
             .values()
             .flat_map(|q| {
                 let id = q.quest_id;
-                q.completed.values().map(move | c| QuestCompletion {
+                q.completed.values().map(move |c| QuestCompletion {
                     id,
                     user: c.uuid.clone(),
                     timestamp: Utc.timestamp_millis(c.timestamp),
