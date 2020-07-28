@@ -32,6 +32,7 @@ pub struct QuestDetails {
     pub desc: Vec<String>,
     pub unlocks: Vec<QuestRef>,
     pub requires: Vec<QuestRef>,
+    pub tasks: Vec<String>,
 }
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize, Clone)]
@@ -46,7 +47,7 @@ pub struct Data {
     pub completions: Vec<QuestCompletion>,
 }
 
-pub fn strip_formatting(str: &str) -> String {
+pub fn fix_formatting(str: &str) -> String {
     let mut result = String::new();
     let mut chars = str.chars();
     while let Some(c) = chars.next() {
@@ -71,9 +72,9 @@ pub fn load_data<P: AsRef<Path>>(dir: P) -> Data {
         .quest_lines
         .values()
         .flat_map(|ql| {
-            let name = ql.properties.betterquesting.name.clone();
+            let name = fix_formatting(&ql.properties.betterquesting.name);
             let id = ql.line_id;
-            let desc = ql.properties.betterquesting.desc.clone();
+            let desc = fix_formatting(&ql.properties.betterquesting.desc);
             ql.quests
                 .values()
                 .map(|q| {
@@ -114,26 +115,14 @@ pub fn load_data<P: AsRef<Path>>(dir: P) -> Data {
         .values()
         .map(|q| QuestDetails {
             id: q.quest_id,
-            name: strip_formatting(&q.properties.betterquesting.name),
+            name: fix_formatting(&q.properties.betterquesting.name),
+            questline: quest_ql.get(&q.quest_id).map(QuestLineRef::to_owned),
             desc: q
                 .properties
                 .betterquesting
                 .desc
                 .lines()
-                .map(|s| s.to_string())
-                .collect(),
-            questline: quest_ql.get(&q.quest_id).map(QuestLineRef::to_owned),
-            requires: q
-                .pre_requisites
-                .iter()
-                .map(|id| {
-                    let ref_q = quests.get(id).unwrap();
-                    QuestRef {
-                        id: ref_q.quest_id,
-                        name: ref_q.properties.betterquesting.name.clone(),
-                        questline: quest_ql.get(&ref_q.quest_id).map(QuestLineRef::to_owned),
-                    }
-                })
+                .map(fix_formatting)
                 .collect(),
             unlocks: quest_unlocks
                 .get(&q.quest_id)
@@ -143,12 +132,25 @@ pub fn load_data<P: AsRef<Path>>(dir: P) -> Data {
                     let quest = quests.get(&ref_quest_id).unwrap();
                     QuestRef {
                         id: *ref_quest_id,
-                        name: strip_formatting(&quest.properties.betterquesting.name),
+                        name: fix_formatting(&quest.properties.betterquesting.name),
                         questline: quest_ql.get(ref_quest_id).map(QuestLineRef::to_owned),
                     }
                 })
                 .collect::<BinaryHeap<_>>()
                 .into_sorted_vec(),
+            requires: q
+                .pre_requisites
+                .iter()
+                .map(|id| {
+                    let ref_q = quests.get(id).unwrap();
+                    QuestRef {
+                        id: ref_q.quest_id,
+                        name: fix_formatting(&ref_q.properties.betterquesting.name),
+                        questline: quest_ql.get(&ref_q.quest_id).map(QuestLineRef::to_owned),
+                    }
+                })
+                .collect(),
+            tasks: q.tasks.values().map(|t| format!("{:?}", t)).collect(),
         })
         .map(|q| (q.id, q))
         .collect();

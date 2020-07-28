@@ -13,10 +13,19 @@
   <body>
     <div class="container">
         <h1>{{quest.name}} (#{{quest.id}})</h1>
-
-        {% for line in quest.desc %}
-          {{line}}<br/>
-        {% endfor %}
+        <div class="card">
+          <div class="card-body">
+            {% for line in quest.desc %}
+              {{line}}<br/>
+            {% endfor %}
+          </div>
+        </div>
+        Tasks:
+        <ul>
+          {% for task in quest.tasks %}
+            <li>{{task}}</li>
+          {% endfor %}
+        </ul>
         Requires:
         <ul>
           {% for req in quest.requires %}
