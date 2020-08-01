@@ -1,7 +1,5 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 use ::betterquesting_report::parsers;
-
-use chrono::{DateTime, Utc};
 use parsers::{QuestCompletion, QuestDetails};
 use rocket::State;
 use rocket_contrib::templates::Template;
