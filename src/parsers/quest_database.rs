@@ -29,7 +29,33 @@ pub struct Quest {
     #[serde(rename = "tasks:9")]
     pub tasks: HashMap<String, Task>,
     #[serde(rename = "rewards:9")]
-    pub rewards: ::serde_json::Value,
+    pub rewards: HashMap<String, Rewards>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Rewards {
+    #[serde(rename = "rewardID:8")]
+    reward_id: RewardType,
+    #[serde(rename = "index:3")]
+    index: i64,
+    #[serde(rename = "rewards:9")]
+    rewards: Option<HashMap<String, Item>>,
+    #[serde(rename = "choices:9")]
+    choices: Option<HashMap<String, Item>>,
+    #[serde(rename = "amount:3")]
+    amount: Option<i64>,
+    #[serde(rename = "isLevels:1")]
+    is_levels: Option<i64>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub enum RewardType {
+    #[serde(rename = "bq_standard:choice")]
+    BqStandardChoice,
+    #[serde(rename = "bq_standard:item")]
+    BqStandardItem,
+    #[serde(rename = "bq_standard:xp")]
+    BqStandardXp,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -50,7 +76,7 @@ pub enum BqTaskType {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 
-pub struct RequiredItem {
+pub struct Item {
     #[serde(rename = "id:8")]
     pub id: String,
     #[serde(rename = "Count:3")]
@@ -62,7 +88,7 @@ pub struct RequiredItem {
     #[serde(rename = "OreDict:8")]
     pub ore_dict: String,
     #[serde(rename = "tag:10")]
-    pub tag: Option<HashMap<String, serde_json::Value>>,
+    pub nbt: Option<HashMap<String, serde_json::Value>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -81,7 +107,7 @@ pub struct Task {
     #[serde(rename = "consume:1")]
     pub consume: Option<i64>,
     #[serde(rename = "requiredItems:9")]
-    pub required_items: Option<HashMap<String, RequiredItem>>,
+    pub required_items: Option<HashMap<String, Item>>,
     #[serde(rename = "taskID:8")]
     pub task_id: BqTaskType,
     #[serde(rename = "allowSmelt:1")]
@@ -202,7 +228,8 @@ pub struct Icon {
     pub damage: i64,
     #[serde(rename = "OreDict:8")]
     pub ore_dict: String,
-    // pub tag: Option<Tag>,
+    #[serde(rename = "tag:10")]
+    pub nbt: Option<HashMap<String, serde_json::Value>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -270,8 +297,8 @@ pub struct Icon2 {
     pub damage: i64,
     #[serde(rename = "OreDict:8")]
     pub ore_dict: String,
-    // #[serde(rename = "tag:10")]
-    // pub tag: Option<Tag2>,
+    #[serde(rename = "tag:10")]
+    pub nbt: Option<HashMap<String, serde_json::Value>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

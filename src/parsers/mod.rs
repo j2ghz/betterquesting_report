@@ -170,7 +170,12 @@ pub fn load_data<P: AsRef<Path>>(dir: P) -> Data {
                             .clone()
                             .unwrap()
                             .values()
-                            .map(|i| format!("{}x {}", i.count, i.id))
+                            .map(|i| {
+                                format!(
+                                    "{}x {} (dmg: {} nbt: {:?})",
+                                    i.count, i.id, i.damage, i.nbt
+                                )
+                            })
                             .collect::<Vec<_>>(),
                     },
                     quest_database::BqTaskType::StandardFluid => QuestTask {
@@ -198,7 +203,12 @@ pub fn load_data<P: AsRef<Path>>(dir: P) -> Data {
                             .clone()
                             .unwrap()
                             .values()
-                            .map(|i| format!("{}x {:?}", i.count, i))
+                            .map(|i| {
+                                format!(
+                                    "{}x {} (dmg: {} nbt: {:?})",
+                                    i.count, i.id, i.damage, i.nbt
+                                )
+                            })
                             .collect::<Vec<_>>(),
                     },
                 })
