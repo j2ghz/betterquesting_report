@@ -29,33 +29,35 @@ pub struct Quest {
     #[serde(rename = "tasks:9")]
     pub tasks: HashMap<String, Task>,
     #[serde(rename = "rewards:9")]
-    pub rewards: HashMap<String, Rewards>,
+    pub rewards: HashMap<String, RewardType>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Rewards {
-    #[serde(rename = "rewardID:8")]
-    reward_id: RewardType,
-    #[serde(rename = "index:3")]
-    index: i64,
-    #[serde(rename = "rewards:9")]
-    rewards: Option<HashMap<String, Item>>,
-    #[serde(rename = "choices:9")]
-    choices: Option<HashMap<String, Item>>,
-    #[serde(rename = "amount:3")]
-    amount: Option<i64>,
-    #[serde(rename = "isLevels:1")]
-    is_levels: Option<i64>,
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(tag = "rewardID:8")]
 pub enum RewardType {
     #[serde(rename = "bq_standard:choice")]
-    BqStandardChoice,
+    Choice {
+        #[serde(rename = "index:3")]
+        index: i64,
+        #[serde(rename = "choices:9")]
+        choices: HashMap<String, Item>,
+    },
     #[serde(rename = "bq_standard:item")]
-    BqStandardItem,
+    Item {
+        #[serde(rename = "index:3")]
+        index: i64,
+        #[serde(rename = "rewards:9")]
+        rewards: HashMap<String, Item>,
+    },
     #[serde(rename = "bq_standard:xp")]
-    BqStandardXp,
+    Xp {
+        #[serde(rename = "index:3")]
+        index: i64,
+        #[serde(rename = "amount:3")]
+        amount: i64,
+        #[serde(rename = "isLevels:1")]
+        is_levels: i64,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

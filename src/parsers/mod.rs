@@ -79,7 +79,7 @@ pub fn load_data<P: AsRef<Path>>(dir: P) -> Data {
         .flat_map(|ql| {
             let name = fix_formatting(&ql.properties.betterquesting.name);
             let id = ql.line_id;
-            let desc = fix_formatting(&ql.properties.betterquesting.desc);
+            let _desc = fix_formatting(&ql.properties.betterquesting.desc); //TODO: use later
             ql.quests
                 .values()
                 .map(|q| {
