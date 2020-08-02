@@ -23,6 +23,11 @@ pub struct QuestRef {
     pub id: i64,
     pub name: String,
 }
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize)]
+pub struct QuestTask {
+    pub task_type: String,
+    pub subtasks: Vec<String>,
+}
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize)]
 pub struct QuestDetails {
@@ -32,7 +37,7 @@ pub struct QuestDetails {
     pub desc: Vec<String>,
     pub unlocks: Vec<QuestRef>,
     pub requires: Vec<QuestRef>,
-    pub tasks: Vec<String>,
+    pub tasks: Vec<QuestTask>,
 }
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize, Clone)]
@@ -150,7 +155,54 @@ pub fn load_data<P: AsRef<Path>>(dir: P) -> Data {
                     }
                 })
                 .collect(),
-            tasks: q.tasks.values().map(|t| format!("{:?}", t)).collect(),
+            tasks: q
+                .tasks
+                .values()
+                .map(|t| match t.task_id {
+                    quest_database::BqTaskType::StandardCheckbox => QuestTask {
+                        task_type: "Checkbox".to_string(),
+                        subtasks: Vec::default(),
+                    },
+                    quest_database::BqTaskType::StandardCrafting => QuestTask {
+                        task_type: "Craft".to_string(),
+                        subtasks: t
+                            .required_items
+                            .clone()
+                            .unwrap()
+                            .values()
+                            .map(|i| format!("{}x {}", i.count, i.id))
+                            .collect::<Vec<_>>(),
+                    },
+                    quest_database::BqTaskType::StandardFluid => QuestTask {
+                        task_type: "Craft".to_string(),
+                        subtasks: t
+                            .required_fluids
+                            .clone()
+                            .unwrap()
+                            .values()
+                            .map(|i| format!("{}L of {}", i.amount, i.fluid_name))
+                            .collect::<Vec<_>>(),
+                    },
+                    quest_database::BqTaskType::StandardHunt => QuestTask {
+                        task_type: "Unsupported".to_string(),
+                        subtasks: Vec::default(),
+                    },
+                    quest_database::BqTaskType::StandardLocation => QuestTask {
+                        task_type: "Unsupported".to_string(),
+                        subtasks: Vec::default(),
+                    },
+                    quest_database::BqTaskType::StandardRetrieval => QuestTask {
+                        task_type: "Retrieve".to_string(),
+                        subtasks: t
+                            .required_items
+                            .clone()
+                            .unwrap()
+                            .values()
+                            .map(|i| format!("{}x {:?}", i.count, i))
+                            .collect::<Vec<_>>(),
+                    },
+                })
+                .collect(),
         })
         .map(|q| (q.id, q))
         .collect();

@@ -132,9 +132,9 @@ pub struct Task {
 
 pub struct RequiredFluids {
     #[serde(rename = "FluidName:8")]
-    pub fluid_name_8: String,
+    pub fluid_name: String,
     #[serde(rename = "Amount:3")]
-    pub amount_3: i64,
+    pub amount: i64,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

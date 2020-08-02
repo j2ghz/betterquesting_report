@@ -21,11 +21,18 @@
           </div>
         </div>
         Tasks:
-        <ul>
+        <ol>
           {% for task in quest.tasks %}
-            <li>{{task}}</li>
+            <li>
+              <span class="badge badge-light">{{task.task_type}}</span>
+              <ul>
+                {% for subtask in task.subtasks %}
+                  <li>{{subtask}}</li>
+                {% endfor %}
+              </ul>
+            </li>
           {% endfor %}
-        </ul>
+        </ol>
         Requires:
         <ul>
           {% for req in quest.requires %}
