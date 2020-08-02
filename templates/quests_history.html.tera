@@ -12,28 +12,25 @@
       <h1 class="title">
         Quests completed
       </h1>      
-        {% for quest_date in quests %}            
-            <h2 class="title is-2">{{quest_date.date}}</h2>
-            {% for quest in quest_date.quests %}
-                <div class="box">
-                    <article class="media">
-                        <div class="media-content">                            
-                            <span class="tag is-light">{{quest.questline}}</span> <strong>{{quest.name}}</strong> <a href="/quest/{{quest.id}}">(#{{quest.id}})</a> <small>@{{quest.user}}</small> <small>{{quest.time}}</small>
-                              {% for q in quest.unlocks %}
-                                {% if loop.first %}
-                                  <h6 class="title is-6">Unlocks:</h6>
-                                  <div class="content"><ul>
-                                {% endif %}
-                                <li><span class="tag is-light">{{q.questline}}</span> {{q.name}} <a href="/quest/{{q.id}}">(#{{q.id}})</a></li>
-                                {% if loop.last %}
-                                  </ul></div>
-                                {% endif %}
-                              {% endfor%}                            
-                        </div>
-                    </article>
+        {% for q in quests %}
+            <div class="box">
+                <article class="media">
+                    <div class="media-content">                            
+                        <span class="tag is-light">{{q.quest.questline.name | default(value="Unknown")}}</span> <strong>{{q.quest.name}}</strong> <a href="/quest/{{q.quest.id}}">(#{{q.quest.id}})</a> <small>@{{q.user}}</small> <small>{{q.timestamp}}</small>
+                          {# {% for q in quest.unlocks %}
+                            {% if loop.first %}
+                              <h6 class="title is-6">Unlocks:</h6>
+                              <div class="content"><ul>
+                            {% endif %}
+                            <li><span class="tag is-light">{{q.questline}}</span> {{q.name}} <a href="/quest/{{q.id}}">(#{{q.id}})</a></li>
+                            {% if loop.last %}
+                              </ul></div>
+                            {% endif %}
+                          {% endfor%}                             #}
                     </div>
-            {% endfor %}            
-        {% endfor %}      
+                </article>
+                </div>
+        {% endfor %}                
     </div>
   </section>
   </body>
