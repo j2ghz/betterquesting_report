@@ -38,6 +38,7 @@ pub struct QuestDetails {
     pub unlocks: Vec<QuestRef>,
     pub requires: Vec<QuestRef>,
     pub tasks: Vec<QuestTask>,
+    pub rewards: String,
 }
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize, Clone)]
@@ -213,6 +214,7 @@ pub fn load_data<P: AsRef<Path>>(dir: P) -> Data {
                     },
                 })
                 .collect(),
+            rewards: format!("{:?}", q.rewards.values().collect::<Vec<_>>()),
         })
         .map(|q| (q.id, q))
         .collect();

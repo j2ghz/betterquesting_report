@@ -33,6 +33,8 @@
             </li>
           {% endfor %}
         </ol>
+        Rewards:
+        {{quest.rewards}}
         Requires:
         <ul>
           {% for req in quest.requires %}
