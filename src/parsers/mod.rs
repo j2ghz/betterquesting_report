@@ -24,19 +24,19 @@ pub struct QuestRef {
     pub id: i64,
     pub name: String,
 }
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize, Clone)]
 pub struct QuestTask {
     pub task_type: String,
     pub subtasks: Vec<String>,
 }
 
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize, Clone)]
 pub struct QuestRewards {
     pub reward_type: String,
     pub rewards: Vec<String>,
 }
 
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize, Clone)]
 pub struct QuestDetails {
     pub id: i64,
     pub name: String,
@@ -54,7 +54,7 @@ pub struct QuestLineRef {
     pub name: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Clone)]
 pub struct Data {
     pub quests: HashMap<i64, QuestDetails>,
     pub completions: Vec<QuestCompletion>,

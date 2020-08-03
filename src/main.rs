@@ -4,7 +4,7 @@ use parsers::{QuestCompletion, QuestDetails};
 use rocket::State;
 use rocket_contrib::templates::Template;
 use serde::Serialize;
-use std::path::PathBuf;
+use std::{collections::BinaryHeap, path::PathBuf};
 
 #[macro_use]
 extern crate rocket;
@@ -23,9 +23,25 @@ struct QuestDetailsCtx<'a> {
     quest: &'a QuestDetails,
 }
 
+#[derive(Debug, Serialize)]
+struct IndexCtx {
+    quests: Vec<QuestDetails>,
+}
+
 #[get("/")]
-fn index() -> &'static str {
-    "Hello, world!"
+fn index(file_loc: State<FileLocation>) -> Template {
+    let data = parsers::load_data(&file_loc.betterquesting);
+    Template::render(
+        "index",
+        &IndexCtx {
+            quests: data
+                .quests
+                .values()
+                .map(|q| q.to_owned())
+                .collect::<BinaryHeap<QuestDetails>>()
+                .into_sorted_vec(),
+        },
+    )
 }
 
 #[get("/quests/history")]
