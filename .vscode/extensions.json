@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+        "bungcip.better-toml",
+        "serayuzgur.crates",
+        "hdevalke.rust-test-lens",
+        "matklad.rust-analyzer"
+    ],
+    "unwantedRecommendations": [
+        "kalitaalexey.vscode-rust",
+        "rust-lang.rust"
+    ]
+}
