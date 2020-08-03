@@ -209,7 +209,12 @@ pub fn load_data<P: AsRef<Path>>(dir: P) -> Data {
                         subtasks: Vec::default(),
                     },
                     quest_database::BqTaskType::StandardRetrieval => QuestTask {
-                        task_type: "Retrieve".to_string(),
+                        task_type: {
+                            match t.consume {
+                                Some(1) => format!("Retrieve (Consume)"),
+                                _ => format!("Retrieve"),
+                            }
+                        },
                         subtasks: t
                             .required_items
                             .clone()

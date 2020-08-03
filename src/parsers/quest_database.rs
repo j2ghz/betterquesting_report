@@ -96,6 +96,10 @@ pub struct Item {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 
 pub struct Task {
+    #[serde(rename = "index:3")]
+    pub index: i64,
+    #[serde(rename = "taskID:8")]
+    pub task_id: BqTaskType,
     #[serde(rename = "partialMatch:1")]
     pub partial_match: Option<i64>,
     #[serde(rename = "autoConsume:1")]
@@ -104,14 +108,10 @@ pub struct Task {
     pub group_detect: Option<i64>,
     #[serde(rename = "ignoreNBT:1")]
     pub ignore_nbt: Option<i64>,
-    #[serde(rename = "index:3")]
-    pub index: i64,
     #[serde(rename = "consume:1")]
     pub consume: Option<i64>,
     #[serde(rename = "requiredItems:9")]
     pub required_items: Option<HashMap<String, Item>>,
-    #[serde(rename = "taskID:8")]
-    pub task_id: BqTaskType,
     #[serde(rename = "allowSmelt:1")]
     pub allow_smelt: Option<i64>,
     #[serde(rename = "allowCraft:1")]
