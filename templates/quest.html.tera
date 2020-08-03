@@ -20,7 +20,8 @@
             {% endfor %}
           </div>
         </div>
-        Tasks:
+        
+        <h3>Tasks:</h3>
         <ol>
           {% for task in quest.tasks %}
             <li>
@@ -33,15 +34,29 @@
             </li>
           {% endfor %}
         </ol>
-        Rewards:
-        {{quest.rewards}}
-        Requires:
+
+        <h3>Rewards:</h3>
+        <ul>
+          {% for reward in quest.rewards %}
+            <li>
+              <span class="badge badge-light">{{reward.reward_type}}</span>
+              <ul>
+                {% for item in reward.rewards %}
+                  <li>{{item}}</li>
+                {% endfor %}
+              </ul>
+            </li>
+          {% endfor %}
+        </ul>
+        
+        <h3>Requires:</h3>
         <ul>
           {% for req in quest.requires %}
             <li><span class="badge badge-light">{{req.questline.name | default (value="Unknown")}}</span> {{req.name}} (<a href="/quest/{{req.id}}">#{{req.id}}</a>)</li>
           {% endfor %}
         </ul>
-        Unlocks:
+
+        <h3>Unlocks:</h3>
         <ul>
           {% for unl in quest.unlocks %}
             <li><span class="badge badge-light">{{unl.questline.name | default (value="Unknown")}}</span> {{unl.name}} (<a href="/quest/{{unl.id}}">#{{unl.id}}</a>)</li>

@@ -1,4 +1,5 @@
 use chrono::{DateTime, TimeZone, Utc};
+use quest_database::Item;
 use serde::Serialize;
 use std::{
     collections::{BinaryHeap, HashMap},
@@ -30,6 +31,12 @@ pub struct QuestTask {
 }
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize)]
+pub struct QuestRewards {
+    pub reward_type: String,
+    pub rewards: Vec<String>,
+}
+
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize)]
 pub struct QuestDetails {
     pub id: i64,
     pub name: String,
@@ -38,7 +45,7 @@ pub struct QuestDetails {
     pub unlocks: Vec<QuestRef>,
     pub requires: Vec<QuestRef>,
     pub tasks: Vec<QuestTask>,
-    pub rewards: String,
+    pub rewards: Vec<QuestRewards>,
 }
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Serialize, Clone)]
@@ -64,6 +71,10 @@ pub fn fix_formatting(str: &str) -> String {
         }
     }
     result
+}
+
+pub fn render_item(i: &Item) -> String {
+    format!("{}x {} (dmg: {} nbt: {:?})", i.count, i.id, i.damage, i.nbt)
 }
 
 pub fn load_data<P: AsRef<Path>>(dir: P) -> Data {
@@ -214,7 +225,28 @@ pub fn load_data<P: AsRef<Path>>(dir: P) -> Data {
                     },
                 })
                 .collect(),
-            rewards: format!("{:?}", q.rewards.values().collect::<Vec<_>>()),
+            rewards: q
+                .rewards
+                .values()
+                .map(|r| match r {
+                    quest_database::RewardType::Choice { index: _, choices } => QuestRewards {
+                        reward_type: "Choose".to_string(),
+                        rewards: choices.values().map(render_item).collect(),
+                    },
+                    quest_database::RewardType::Item { index: _, rewards } => QuestRewards {
+                        reward_type: "Items".to_string(),
+                        rewards: rewards.values().map(render_item).collect(),
+                    },
+                    quest_database::RewardType::Xp {
+                        index: _,
+                        amount,
+                        is_levels: _,
+                    } => QuestRewards {
+                        reward_type: "Levels".to_string(),
+                        rewards: vec![format!("{} XP", amount)],
+                    },
+                })
+                .collect(),
         })
         .map(|q| (q.id, q))
         .collect();
