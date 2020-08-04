@@ -13,3 +13,10 @@ chrono = { version = "0.4", features = ["serde"] }
 rocket = "0.4.5"
 rocket_contrib = {version = "0.4.5", features = ["handlebars_templates", "tera_templates"]}
 itertools = "0.9.0"
+
+[dev-dependencies]
+criterion = "0.3"
+
+[[bench]]
+name = "bench"
+harness = false
